@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DS AI</title>
+
+    <style>
+        body {
+            font-family: monospace;
+            background: #111;
+            color: #0f0;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+        }
+
+        input, textarea {
+            width: 80%;
+            padding: 5px;
+            font-family: monospace;
+            color: #0f0;
+            background: #222;
+            border: 1px solid #0f0;
+        }
+
+        button {
+            padding: 5px;
+            margin-left: 5px;
+            cursor: pointer;
+            background: #222;
+            color: #0f0;
+            border: 1px solid #0f0;
+        }
+
+        .burger {
+            cursor: pointer;
+            font-size: 24px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            user-select: none;
+        }
+
+        .menu {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 40px;
+            width: 200px;
+            background: #222;
+            border: 1px solid #0f0;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .history p {
+            border-bottom: 1px solid #0f0;
+            margin: 2px 0;
+            font-size: 12px;
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #0f0;
+            background: #222;
+        }
+
+        .js-response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #0f0;
+            background: #222;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="burger" onclick="toggleMenu()">[ Menu ]</div>
+    <div class="menu" id="menu">
+        <h4>Chat History</h4>
+        <div class="history">
+            <div th:each="msg : ${messages}">
+                <p><b th:text="${msg.user}">User</b>: <span th:text="${msg.text}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <h3>DS AI</h3>
+    <img th:src="@{/images/img.png}" alt="DS Image" width="120">
+    <p>The first NDS running AI!</p>
+    <form action="/ask" method="get">
+        <input type="text" name="q" placeholder="Ask something">
+        <button type="submit">Send</button>
+    </form>
+
+    <div class="response">
+        <p th:text="${response}">Response will appear here</p>
+    </div>
+
+    <h3>JS Evaluator</h3>
+    <p>Type JS code and run it below. Errors show with line numbers in red.</p>
+    <textarea id="jsInput" rows="5" placeholder="Type your JS code here..."></textarea><br>
+    <button onclick="evaluateJS()">Run JS</button>
+    <button onclick="clearOutput()">Clear Output</button>
+
+    <div class="js-response" id="output">
+        JS output will appear here...
+</div>
+
+<p th:text="${ip}"></p>
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById('menu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function evaluateJS() {
+        var input = document.getElementById('jsInput').value;
+        var outputDiv = document.getElementById('output');
+        var resultText = "";
+
+        try {
+            var result = eval(input);
+            resultText += "Result: " + result + "<br>";
+        } catch (e) {
+            var lineNumber = "unknown";
+            if (e.lineNumber !== undefined) {
+                lineNumber = e.lineNumber;
+            } else {
+                try {
+                    if (e.stack) {
+                        var match = e.stack.match(/<anonymous>:(\d+):\d+/);
+                        if (match) lineNumber = match[1];
+                    }
+                } catch(err2) {}
+            }
+
+            resultText += "<span class='error'>Error: " + e.name + " - " + e.message + " (Line: " + lineNumber + ")</span><br>";
+        }
+
+        outputDiv.innerHTML += resultText;
+    }
+
+    function clearOutput() {
+        document.getElementById('output').innerHTML = "";
+        document.getElementById('jsInput').value = "";
+    }
+</script>
+
+</body>
+</html>
