@@ -159,3 +159,6 @@ This project shows that even a **2009 handheld console** can interact with **mod
 ---
 
 ### ⭐ If you found this interesting, feel free to star the repo or share!
+
+## 📄 License
+This project is licensed under the MIT License.
